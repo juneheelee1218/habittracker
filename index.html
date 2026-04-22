@@ -8,20 +8,9 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --j: #3a7bd5;
-      --j-bg: #e8f0fb;
-      --j-light: #b8d0f5;
-      --j-dark: #1e4fa3;
-      --j-text: #1e3a6e;
-      --c: #1b6b3a;
-      --c-bg: #d8eedd;
-      --c-light: #9ecfaf;
-      --c-dark: #0a2818;
-      --c-text: #14472a;
-      --bg: #f4f7f5;
-      --white: #ffffff;
-      --border: #e4e9e6;
-      --muted: #9aaa9f;
+      --j: #3a7bd5; --j-bg: #e8f0fb; --j-light: #b8d0f5; --j-dark: #1e4fa3; --j-text: #1e3a6e;
+      --c: #1b6b3a; --c-bg: #d8eedd; --c-light: #9ecfaf; --c-dark: #0a2818; --c-text: #14472a;
+      --bg: #f4f7f5; --white: #ffffff; --border: #e4e9e6; --muted: #9aaa9f;
     }
     html, body { height: 100%; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #1a2e22; min-height: 100vh; }
@@ -29,11 +18,8 @@
 
     #header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.93);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      padding: 20px 20px 0;
-      text-align: center;
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); padding: 20px 20px 0; text-align: center;
     }
     #header h1 { font-size: clamp(20px,4vw,30px); color: #0f2019; letter-spacing: 0.02em; margin-bottom: 2px; }
     .subtitle { font-size: 11px; color: var(--muted); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 16px; }
@@ -42,8 +28,7 @@
     .arrow-btn {
       width: 32px; height: 32px; border-radius: 50%;
       border: 1.5px solid var(--c); background: var(--white); color: var(--c);
-      font-size: 18px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: all 0.15s; flex-shrink: 0;
     }
     .arrow-btn:hover:not(:disabled) { background: var(--c); color: white; }
@@ -69,6 +54,7 @@
       gap: 20px; align-items: start;
     }
 
+    /* ── CARD ── */
     .card { background: var(--white); border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
     .card-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
     .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
@@ -76,16 +62,12 @@
     .card-sub { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; margin-top: 1px; }
     .card-body { padding: 16px 18px; }
 
+    /* ── HABITS ── */
     .habit-row { margin-bottom: 20px; }
     .habit-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .habit-label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
-    .yt-btn {
-      width: 18px; height: 18px; border-radius: 50%; background: #ff0000; color: white;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 7px; text-decoration: none; flex-shrink: 0;
-    }
+    .yt-btn { width: 18px; height: 18px; border-radius: 50%; background: #ff0000; color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 7px; text-decoration: none; flex-shrink: 0; }
     .habit-count { font-size: 11px; font-weight: 700; }
-
     .day-tiles { display: flex; gap: 4px; }
     .day-tile {
       flex: 1; aspect-ratio: 1; min-width: 0; border-radius: 8px;
@@ -98,16 +80,16 @@
     .day-tile.checked .dl { color: white; }
     .day-tile.checked .dc { display: block; }
     .day-tile.locked { opacity: 0.25; cursor: default; }
-
     .pbar-wrap { margin-top: 5px; height: 3px; border-radius: 99px; background: #f0f0f0; overflow: hidden; }
     .pbar { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
-
     .summary { margin-top: 4px; padding: 9px 13px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
     .summary-label { font-size: 12px; font-style: italic; }
     .summary-pills { display: flex; gap: 4px; }
     .summary-pill { font-size: 11px; font-weight: 700; background: white; border-radius: 6px; padding: 2px 8px; }
 
-    .todo-input-wrap { padding: 12px 16px 10px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+    /* ── TODO INPUT ── */
+    .todo-input-wrap { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); }
+    .todo-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .todo-input {
       flex: 1; border: 1.5px solid #e8e8e8; border-radius: 9px;
       padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
@@ -116,31 +98,63 @@
     .todo-input:focus { border-color: #3a7bd5; }
     .todo-add { border: none; border-radius: 9px; padding: 8px 14px; font-size: 17px; cursor: pointer; color: white; flex-shrink: 0; }
 
-    .todo-list { padding: 10px 14px; min-height: 70px; }
+    /* Day picker row */
+    .day-picker { display: flex; gap: 4px; }
+    .day-pick-btn {
+      flex: 1; padding: 5px 2px; border-radius: 7px; border: 1.5px solid #eee;
+      background: #fafafa; font-size: 10px; font-weight: 700; color: #bbb;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s;
+      text-align: center;
+    }
+    .day-pick-btn.selected { color: white; border-color: transparent; }
+    .day-pick-btn.none-btn { flex: none; padding: 5px 10px; color: #ccc; font-size: 10px; }
+    .day-pick-btn.none-btn.selected { background: #eee; color: #999; }
+
+    /* ── TODO LIST ── */
+    .todo-list { padding: 8px 14px 4px; min-height: 60px; }
     .todo-empty { text-align: center; color: #ccc; font-size: 13px; padding: 20px 0; font-style: italic; }
-    .todo-item { display: flex; align-items: center; gap: 9px; padding: 8px 9px; border-radius: 9px; margin-bottom: 4px; border: 1px solid #efefef; background: white; transition: all 0.15s; }
+
+    /* Day group header */
+    .day-group-header {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin: 10px 0 5px; padding-left: 2px;
+    }
+    .day-group-header:first-child { margin-top: 2px; }
+
+    .todo-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 9px; border-radius: 9px; margin-bottom: 4px;
+      border: 1px solid #efefef; background: white; transition: all 0.15s;
+    }
     .todo-item.done { background: #fafafa; border-color: #f0f0f0; }
-    .todo-check { width: 19px; height: 19px; border-radius: 5px; padding: 0; border: 2px solid #ddd; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: white; transition: all 0.12s; }
+    .todo-check {
+      width: 19px; height: 19px; border-radius: 5px; padding: 0;
+      border: 2px solid #ddd; background: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 10px; color: white; transition: all 0.12s;
+    }
     .todo-text { flex: 1; font-size: 13px; color: #333; line-height: 1.4; }
     .todo-item.done .todo-text { text-decoration: line-through; color: #bbb; }
+    .todo-day-badge {
+      font-size: 10px; font-weight: 700; border-radius: 5px;
+      padding: 2px 7px; flex-shrink: 0; opacity: 0.85;
+    }
     .todo-del { background: none; border: none; color: #ddd; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; transition: color 0.12s; }
     .todo-del:hover { color: #aaa; }
     .todo-footer { padding: 6px 16px 13px; font-size: 11px; color: #ccc; font-style: italic; text-align: center; }
 
+    /* ── SYNC / LOADING ── */
     #sync-bar {
       position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
-      background: #1a2e22; color: white; font-size: 12px;
-      padding: 6px 16px; border-radius: 99px;
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999;
-      font-family: 'DM Sans', sans-serif;
+      background: #1a2e22; color: white; font-size: 12px; padding: 6px 16px;
+      border-radius: 99px; opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 999; font-family: 'DM Sans', sans-serif;
     }
     #sync-bar.show { opacity: 1; }
-
     #loading {
       position: fixed; inset: 0; background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      font-family: 'DM Serif Display', serif; font-size: 22px; color: #1b6b3a;
-      z-index: 999;
+      font-family: 'DM Serif Display', serif; font-size: 22px; color: #1b6b3a; z-index: 999;
     }
   </style>
 </head>
@@ -189,11 +203,11 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  // ── CONFIG ──
+  // ── WEEKS ──
   const WEEKS = (() => {
     const weeks = [];
-    const start = new Date(2026, 3, 20); // April 20 2026 (Mon)
-    const end   = new Date(2026, 6, 31); // July 31 2026
+    const start = new Date(2026, 3, 20);
+    const end   = new Date(2026, 6, 31);
     let cur = new Date(start);
     while (cur <= end) {
       const mon = new Date(cur);
@@ -208,13 +222,14 @@
     return weeks;
   })();
 
-  const HABITS = [
-    { id:"hydration", label:"Hydration 💧" },
-    { id:"abs",       label:"Abs 🔥", link:"https://www.youtube.com/watch?v=2pLT-olgUJs&t=48s" },
+  const HABITS  = [
+    { id:"hydration", label:"Hydration" },
+    { id:"abs", label:"Abs", link:"https://www.youtube.com/watch?v=2pLT-olgUJs&t=48s" },
   ];
-  const PEOPLE = ["junehee","carolina"];
-  const DAYS   = ["M","T","W","T","F","S","S"];
-  const COLORS = {
+  const PEOPLE  = ["junehee","carolina"];
+  const DAYS    = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const DAYS_S  = ["M","T","W","T","F","S","S"];
+  const COLORS  = {
     junehee: { bg:"#e8f0fb", accent:"#3a7bd5", light:"#b8d0f5", dark:"#1e4fa3", text:"#1e3a6e" },
     carolina: { bg:"#d8eedd", accent:"#1b6b3a", light:"#9ecfaf", dark:"#0a2818", text:"#14472a" },
   };
@@ -225,14 +240,14 @@
   let weekIdx   = 0;
   let activeTab = "habits";
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
-  let todoInputs = { junehee:"", carolina:"" };
+  // per-person pending input state
+  let pendingText = { junehee:"", carolina:"" };
+  let pendingDay  = { junehee: null, carolina: null }; // null = no specific day
 
   function getTodayIndex(weekMon) {
     const now = new Date(); now.setHours(0,0,0,0);
     const diff = Math.floor((now - weekMon) / 86400000);
-    if (diff < 0) return -1;
-    if (diff > 6) return 7;
-    return diff;
+    if (diff < 0) return -1; if (diff > 6) return 7; return diff;
   }
 
   function emptyWeekHabits() {
@@ -249,22 +264,18 @@
     setTimeout(() => bar.classList.remove("show"), 1800);
   }
 
-  // ── FIREBASE WRITES ──
+  // ── FIREBASE ──
   function writeHabit(weekKey, person, habitId, dayIdx, val) {
     set(ref(db, `habits/${weekKey}/${person}/${habitId}/${dayIdx}`), val);
     flashSync();
   }
-
   function writeTodos(person, list) {
     set(ref(db, `todos/${person}`), list);
     flashSync();
   }
 
   // ── RENDER ──
-  function render() {
-    renderHeader();
-    renderMain();
-  }
+  function render() { renderHeader(); renderMain(); }
 
   function renderHeader() {
     const week = WEEKS[weekIdx];
@@ -272,20 +283,19 @@
     const todayI = getTodayIndex(week.mon);
     document.getElementById("week-status").textContent =
       isNow ? "✦ This Week" :
-      todayI === 7 ? `Week ${weekIdx+1} — done ✓` :
+      todayI===7 ? `Week ${weekIdx+1} — done ✓` :
       `Week ${weekIdx+1} of ${WEEKS.length}`;
     document.getElementById("week-dates").textContent = week.label;
-    document.getElementById("prev-btn").disabled = weekIdx === 0;
-    document.getElementById("next-btn").disabled = weekIdx === WEEKS.length - 1;
+    document.getElementById("prev-btn").disabled = weekIdx===0;
+    document.getElementById("next-btn").disabled = weekIdx===WEEKS.length-1;
 
     const dotsEl = document.getElementById("dots");
     dotsEl.innerHTML = "";
     WEEKS.forEach((w,i) => {
       const d = document.createElement("button");
-      d.className = "dot";
-      d.title = w.label;
-      d.style.width = i===weekIdx ? "20px" : "7px";
-      d.style.background = i===weekIdx ? "#1b6b3a" : i<weekIdx ? "#9ecfaf" : "#ddd";
+      d.className="dot"; d.title=w.label;
+      d.style.width = i===weekIdx?"20px":"7px";
+      d.style.background = i===weekIdx?"#1b6b3a":i<weekIdx?"#9ecfaf":"#ddd";
       d.onclick = () => { weekIdx=i; render(); };
       dotsEl.appendChild(d);
     });
@@ -294,43 +304,39 @@
   function renderMain() {
     const main = document.getElementById("main");
     main.innerHTML = "";
-    if (activeTab === "habits") {
+    if (activeTab==="habits") {
       PEOPLE.forEach(p => main.appendChild(buildHabitCard(p)));
     } else {
       PEOPLE.forEach(p => main.appendChild(buildTodoCard(p)));
     }
   }
 
+  // ── HABIT CARD ──
   function buildHabitCard(person) {
     const C = COLORS[person];
     const week = WEEKS[weekIdx];
-    const isNow = weekIdx === 0;
+    const isNow = weekIdx===0;
     const todayI = getTodayIndex(week.mon);
     const weekHabits = remoteData.habits[week.key] || emptyWeekHabits();
 
     const card = el("div","card");
-
-    // Header
     const head = el("div","card-head");
     head.style.background = `linear-gradient(135deg,${C.bg} 0%,white 100%)`;
     head.innerHTML = `
       <div class="avatar" style="background:${C.accent};color:white">${EMOJI[person]}</div>
       <div>
         <div class="card-name" style="color:${C.dark}">${DISPLAY[person]}</div>
-        <div class="card-sub" style="color:${C.accent}">
-          ${isNow?"this week":todayI===7?"completed":"upcoming"} · week ${weekIdx+1}
-        </div>
+        <div class="card-sub" style="color:${C.accent}">${isNow?"this week":todayI===7?"completed":"upcoming"} · week ${weekIdx+1}</div>
       </div>`;
     card.appendChild(head);
 
     const body = el("div","card-body");
-
     HABITS.forEach(habit => {
-      const raw = weekHabits[person] && weekHabits[person][habit.id];
-      const arr = Array.isArray(raw) ? raw : Array(7).fill(false);
+      const raw   = weekHabits[person]&&weekHabits[person][habit.id];
+      const arr   = Array.isArray(raw)?raw:Array(7).fill(false);
       const limit = todayI<0?0:todayI>=7?7:todayI+1;
       const count = arr.slice(0,limit).filter(Boolean).length;
-      const pct   = limit>0 ? Math.round((count/limit)*100) : 0;
+      const pct   = limit>0?Math.round((count/limit)*100):0;
 
       const row = el("div","habit-row");
       row.innerHTML = `
@@ -346,21 +352,16 @@
       body.appendChild(row);
 
       const tilesWrap = row.querySelector(`#dt-${person}-${habit.id}`);
-      DAYS.forEach((d,i) => {
-        const checked     = arr[i] === true;
-        const isToday     = isNow && i===todayI;
-        const isFutureDay = isNow && i>todayI;
-        const isFutureWk  = todayI===-1;
-        const locked      = isFutureDay || isFutureWk;
-
+      DAYS_S.forEach((d,i) => {
+        const checked = arr[i]===true;
+        const isToday = isNow&&i===todayI;
+        const locked  = (isNow&&i>todayI)||(todayI===-1);
         const btn = el("button","day-tile"+(checked?" checked":"")+(isToday?" today":"")+(locked?" locked":""));
         btn.innerHTML = `<span class="dl">${d}</span><span class="dc">✓</span>`;
         btn.disabled = locked;
-
-        if (checked)       { btn.style.background=C.accent; btn.style.borderColor=C.accent; }
-        else if (isToday)  { btn.style.borderColor=C.accent; btn.style.background=C.bg; }
-
-        if (!locked) btn.onclick = () => writeHabit(week.key, person, habit.id, i, !arr[i]);
+        if (checked)      { btn.style.background=C.accent; btn.style.borderColor=C.accent; }
+        else if (isToday) { btn.style.borderColor=C.accent; btn.style.background=C.bg; }
+        if (!locked) btn.onclick = () => writeHabit(week.key,person,habit.id,i,!arr[i]);
         tilesWrap.appendChild(btn);
       });
     });
@@ -368,20 +369,17 @@
     // Summary
     const sum = el("div","summary");
     sum.style.background = C.bg;
-    const weekHabits2 = remoteData.habits[week.key] || emptyWeekHabits();
-    const todayI2 = getTodayIndex(WEEKS[weekIdx].mon);
+    const wh2 = remoteData.habits[WEEKS[weekIdx].key]||emptyWeekHabits();
+    const ti2 = getTodayIndex(WEEKS[weekIdx].mon);
     sum.innerHTML = `
-      <span class="summary-label" style="color:${C.text}">
-        ${isNow?"so far this week":todayI===7?"final score":"upcoming week"}
-      </span>
+      <span class="summary-label" style="color:${C.text}">${isNow?"so far this week":ti2===7?"final score":"upcoming week"}</span>
       <div class="summary-pills">
         ${HABITS.map(h=>{
-          const raw2 = weekHabits2[person]&&weekHabits2[person][h.id];
-          const a2   = Array.isArray(raw2)?raw2:Array(7).fill(false);
-          const lim2 = todayI2<0?0:todayI2>=7?7:todayI2+1;
-          const c2   = a2.slice(0,lim2).filter(Boolean).length;
-          const p2   = lim2>0?Math.round((c2/lim2)*100):0;
-          return `<span class="summary-pill" style="color:${C.text}">${h.id==="hydration"?"💧":"🔥"} ${lim2===0?"–":p2+"%"}</span>`;
+          const a2=Array.isArray(wh2[person]&&wh2[person][h.id])?wh2[person][h.id]:Array(7).fill(false);
+          const l2=ti2<0?0:ti2>=7?7:ti2+1;
+          const c2=a2.slice(0,l2).filter(Boolean).length;
+          const p2=l2>0?Math.round((c2/l2)*100):0;
+          return `<span class="summary-pill" style="color:${C.text}">${h.id==="hydration"?"💧":"🔥"} ${l2===0?"–":p2+"%"}</span>`;
         }).join("")}
       </div>`;
     body.appendChild(sum);
@@ -389,11 +387,14 @@
     return card;
   }
 
+  // ── TODO CARD ──
   function buildTodoCard(person) {
     const C    = COLORS[person];
-    const raw  = remoteData.todos && remoteData.todos[person];
-    const list = Array.isArray(raw) ? raw : (raw ? Object.values(raw) : []);
-    const done = list.filter(t=>t.done).length;
+    const week = WEEKS[weekIdx];
+    const raw  = remoteData.todos&&remoteData.todos[person];
+    const all  = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
+    // Show all todos (not filtered by week — they have a day label for the current week view)
+    const done = all.filter(t=>t.done).length;
     const other = DISPLAY[person==="junehee"?"carolina":"junehee"];
 
     const card = el("div","card");
@@ -407,46 +408,92 @@
         <div class="card-name" style="color:${C.dark}">${DISPLAY[person]}</div>
         <div class="card-sub" style="color:${C.accent}">to-do list</div>
       </div>
-      ${list.length>0?`<span style="font-size:11px;font-weight:700;color:${C.text};background:${C.bg};border-radius:99px;padding:3px 11px">${done}/${list.length}</span>`:""}`;
+      ${all.length>0?`<span style="font-size:11px;font-weight:700;color:${C.text};background:${C.bg};border-radius:99px;padding:3px 11px">${done}/${all.length}</span>`:""}`;
     card.appendChild(head);
 
-    // Input
+    // ── Input area ──
     const inputWrap = el("div","todo-input-wrap");
+
+    // Text + add button row
+    const inputRow = el("div","todo-input-row");
     const inp = document.createElement("input");
-    inp.className = "todo-input";
-    inp.placeholder = "add something...";
-    inp.value = todoInputs[person];
-    inp.oninput = e => { todoInputs[person]=e.target.value; };
+    inp.className="todo-input"; inp.placeholder="add a task...";
+    inp.value = pendingText[person];
+    inp.oninput = e => { pendingText[person]=e.target.value; };
     inp.onkeydown = e => { if(e.key==="Enter") doAdd(person,inp); };
+
     const addBtn = el("button","todo-add");
     addBtn.style.background = C.accent;
-    addBtn.textContent = "+";
+    addBtn.textContent="+";
     addBtn.onclick = () => doAdd(person,inp);
-    inputWrap.appendChild(inp); inputWrap.appendChild(addBtn);
+    inputRow.appendChild(inp); inputRow.appendChild(addBtn);
+    inputWrap.appendChild(inputRow);
+
+    // Day picker
+    const picker = el("div","day-picker");
+    // "No day" option
+    const noneBtn = el("button","day-pick-btn none-btn");
+    noneBtn.textContent = "any";
+    if (pendingDay[person]===null) {
+      noneBtn.classList.add("selected");
+      noneBtn.style.background="#eee"; noneBtn.style.color="#999";
+    }
+    noneBtn.onclick = () => { pendingDay[person]=null; renderMain(); };
+    picker.appendChild(noneBtn);
+
+    DAYS.forEach((d,i) => {
+      const btn = el("button","day-pick-btn");
+      btn.textContent = d;
+      const isSelected = pendingDay[person]===i;
+      if (isSelected) {
+        btn.classList.add("selected");
+        btn.style.background = C.accent;
+        btn.style.color = "white";
+      }
+      btn.onclick = () => {
+        pendingDay[person] = pendingDay[person]===i ? null : i;
+        renderMain();
+      };
+      picker.appendChild(btn);
+    });
+    inputWrap.appendChild(picker);
     card.appendChild(inputWrap);
 
-    // List
+    // ── Todo list grouped by day ──
     const listEl = el("div","todo-list");
-    if (list.length===0) {
-      listEl.innerHTML = `<div class="todo-empty">nothing here yet ✨</div>`;
+
+    if (all.length===0) {
+      listEl.innerHTML=`<div class="todo-empty">nothing here yet ✨</div>`;
     } else {
-      list.forEach(todo => {
-        const item = el("div","todo-item"+(todo.done?" done":""));
-        const chk  = el("button","todo-check");
-        chk.style.borderColor = todo.done ? C.accent : "#ddd";
-        chk.style.background  = todo.done ? C.accent : "white";
-        chk.textContent = todo.done?"✓":"";
-        chk.onclick = () => writeTodos(person, list.map(t=>t.id===todo.id?{...t,done:!t.done}:t));
+      // Group: undated first, then Mon–Sun
+      const groups = { null:[], 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+      all.forEach(t => {
+        const key = (t.day !== undefined && t.day !== null) ? t.day : null;
+        if (groups[key] !== undefined) groups[key].push(t);
+        else groups[null].push(t);
+      });
 
-        const txt = el("span","todo-text");
-        txt.textContent = todo.text;
+      // Render undated
+      if (groups[null].length > 0) {
+        const hdr = el("div","day-group-header");
+        hdr.textContent = "· anytime";
+        listEl.appendChild(hdr);
+        groups[null].forEach(todo => listEl.appendChild(buildTodoItem(todo, all, person, C, null)));
+      }
 
-        const del = el("button","todo-del");
-        del.textContent = "×";
-        del.onclick = () => writeTodos(person, list.filter(t=>t.id!==todo.id));
+      // Render Mon–Sun
+      DAYS.forEach((dayName, i) => {
+        if (groups[i] && groups[i].length > 0) {
+          // Get the actual date for this day in the current week
+          const dayDate = new Date(week.mon);
+          dayDate.setDate(week.mon.getDate() + i);
+          const dateStr = dayDate.toLocaleDateString("en-US",{month:"short",day:"numeric"});
 
-        item.appendChild(chk); item.appendChild(txt); item.appendChild(del);
-        listEl.appendChild(item);
+          const hdr = el("div","day-group-header");
+          hdr.textContent = `· ${dayName} ${dateStr}`;
+          listEl.appendChild(hdr);
+          groups[i].forEach(todo => listEl.appendChild(buildTodoItem(todo, all, person, C, i)));
+        }
       });
     }
     card.appendChild(listEl);
@@ -457,32 +504,53 @@
     return card;
   }
 
+  function buildTodoItem(todo, allList, person, C, dayIdx) {
+    const item = el("div","todo-item"+(todo.done?" done":""));
+
+    const chk = el("button","todo-check");
+    chk.style.borderColor = todo.done?C.accent:"#ddd";
+    chk.style.background  = todo.done?C.accent:"white";
+    chk.textContent = todo.done?"✓":"";
+    chk.onclick = () => writeTodos(person, allList.map(t=>t.id===todo.id?{...t,done:!t.done}:t));
+
+    const txt = el("span","todo-text");
+    txt.textContent = todo.text;
+
+    const del = el("button","todo-del");
+    del.textContent="×";
+    del.onclick = () => writeTodos(person, allList.filter(t=>t.id!==todo.id));
+
+    item.appendChild(chk);
+    item.appendChild(txt);
+    item.appendChild(del);
+    return item;
+  }
+
   function doAdd(person, inp) {
-    const text = (inp.value||"").trim();
+    const text = (inp.value||pendingText[person]||"").trim();
     if (!text) return;
     const raw  = remoteData.todos&&remoteData.todos[person];
     const list = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
-    writeTodos(person, [...list, {id:Date.now(), text, done:false}]);
-    inp.value = "";
-    todoInputs[person] = "";
+    const newTodo = { id:Date.now(), text, done:false };
+    if (pendingDay[person]!==null) newTodo.day = pendingDay[person];
+    writeTodos(person, [...list, newTodo]);
+    inp.value="";
+    pendingText[person]="";
+    pendingDay[person]=null;
   }
 
-  function el(tag, cls) {
-    const e = document.createElement(tag);
-    if (cls) e.className = cls;
-    return e;
-  }
+  function el(tag,cls) { const e=document.createElement(tag); if(cls)e.className=cls; return e; }
 
   // ── FIREBASE LISTENER ──
-  onValue(ref(db, "/"), snap => {
+  onValue(ref(db,"/"), snap => {
     const val = snap.val();
     if (val) {
       remoteData = val;
-      if (!remoteData.todos)  remoteData.todos  = { junehee:[], carolina:[] };
+      if (!remoteData.todos)  remoteData.todos  = {junehee:[],carolina:[]};
       if (!remoteData.habits) remoteData.habits = {};
     }
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    document.getElementById("loading").style.display="none";
+    document.getElementById("app").style.display="block";
     render();
   });
 
@@ -491,8 +559,7 @@
     btn.onclick = () => {
       document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
-      activeTab = btn.dataset.tab;
-      render();
+      activeTab=btn.dataset.tab; render();
     };
   });
   document.getElementById("prev-btn").onclick = () => { if(weekIdx>0){weekIdx--;render();} };
