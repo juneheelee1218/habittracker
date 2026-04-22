@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌿 junehee & carolina</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: linear-gradient(160deg,#f2f8f4 0%,#e6f2ea 50%,#d8edde 100%); min-height: 100vh; font-family: Georgia, serif; }
+    input:focus { border-color: #4a7c59 !important; box-shadow: 0 0 0 3px rgba(74,124,89,0.12); }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f0f0f0; } ::-webkit-scrollbar-thumb { background: #c3dfc9; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function getWeeks() {
+      const weeks = [];
+      const now = new Date();
+      const startMonday = new Date(now);
+      const day = startMonday.getDay();
+      startMonday.setDate(startMonday.getDate() - (day === 0 ? 6 : day - 1));
+      startMonday.setHours(0, 0, 0, 0);
+      const endDate = new Date(2025, 6, 31);
+      let cursor = new Date(startMonday);
+      while (cursor <= endDate) {
+        const mon = new Date(cursor);
+        const sun = new Date(cursor);
+        sun.setDate(mon.getDate() + 6);
+        weeks.push({
+          key: mon.toISOString().slice(0, 10),
+          mon: new Date(mon),
+          sun: new Date(sun),
+          label: `${mon.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${sun.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+        });
+        cursor.setDate(cursor.getDate() + 7);
+      }
+      return weeks;
+    }
+
+    const WEEKS = getWeeks();
+    const HABITS = [
+      { id: "hydration", label: "Hydration 💧" },
+      { id: "abs", label: "Abs 🔥", link: "https://www.youtube.com/watch?v=2pLT-olgUJs&t=48s" },
+    ];
+    const PEOPLE = ["junehee", "carolina"];
+    const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
+
+    const COLORS = {
+      junehee: { bg: "#eaf3ec", accent: "#4a7c59", light: "#c3dfc9", text: "#2e5940", dark: "#1b3a28", g1: "#4a7c59", g2: "#1b3a28" },
+      carolina: { bg: "#d8eedd", accent: "#1b6b3a", light: "#9ecfaf", text: "#14472a", dark: "#0a2818", g1: "#1b6b3a", g2: "#0a2818" },
+    };
+    const EMOJI = { junehee: "🌿", carolina: "🌲" };
+    const DISPLAY = { junehee: "Junehee", carolina: "Carolina" };
+
+    function habitKey(wk) { return `jc2_habits_${wk}`; }
+    const TODO_KEY = "jc2_todos";
+
+    function emptyHabits() {
+      return PEOPLE.reduce((acc, p) => {
+        acc[p] = HABITS.reduce((h, hab) => { h[hab.id] = Array(7).fill(false); return h; }, {});
+        return acc;
+      }, {});
+    }
+
+    function loadHabits(wk) {
+      try { const s = localStorage.getItem(habitKey(wk)); return s ? JSON.parse(s) : emptyHabits(); }
+      catch { return emptyHabits(); }
+    }
+
+    function loadTodos() {
+      try { const s = localStorage.getItem(TODO_KEY); return s ? JSON.parse(s) : PEOPLE.reduce((a, p) => { a[p] = []; return a; }, {}); }
+      catch { return PEOPLE.reduce((a, p) => { a[p] = []; return a; }, {}); }
+    }
+
+    function getTodayIndex(weekMon) {
+      const now = new Date(); now.setHours(0,0,0,0);
+      const diff = Math.floor((now - weekMon) / 86400000);
+      if (diff < 0) return -1;
+      if (diff > 6) return 7;
+      return diff;
+    }
+
+    function GradBtn({ onClick, disabled, children, style = {} }) {
+      return (
+        <button onClick={onClick} disabled={disabled} style={{
+          width: 34, height: 34, borderRadius: "50%", border: "1.5px solid",
+          borderColor: disabled ? "#ddd" : "#4a7c59",
+          background: disabled ? "#f5f5f5" : "#4a7c59",
+          color: disabled ? "#ccc" : "white",
+          cursor: disabled ? "default" : "pointer",
+          fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0, lineHeight: 1, ...style
+        }}>{children}</button>
+      );
+    }
+
+    function Dashboard() {
+      const [weekIdx, setWeekIdx] = useState(0);
+      const [activeTab, setActiveTab] = useState("habits");
+      const [habits, setHabits] = useState(() => loadHabits(WEEKS[0].key));
+      const [todos, setTodos] = useState(loadTodos);
+      const [inputs, setInputs] = useState({ junehee: "", carolina: "" });
+
+      const week = WEEKS[weekIdx];
+      const isCurrentWeek = weekIdx === 0;
+      const todayIdx = getTodayIndex(week.mon);
+
+      useEffect(() => { setHabits(loadHabits(week.key)); }, [weekIdx]);
+      useEffect(() => { try { localStorage.setItem(habitKey(week.key), JSON.stringify(habits)); } catch {} }, [habits, week.key]);
+      useEffect(() => { try { localStorage.setItem(TODO_KEY, JSON.stringify(todos)); } catch {} }, [todos]);
+
+      const toggleHabit = (person, habitId, dayIdx) => {
+        if (todayIdx === -1) return;
+        if (isCurrentWeek && dayIdx > todayIdx) return;
+        setHabits(prev => {
+          const copy = JSON.parse(JSON.stringify(prev));
+          copy[person][habitId][dayIdx] = !copy[person][habitId][dayIdx];
+          return copy;
+        });
+      };
+
+      const addTodo = (person) => {
+        const text = inputs[person].trim();
+        if (!text) return;
+        setTodos(prev => ({ ...prev, [person]: [...prev[person], { id: Date.now(), text, done: false }] }));
+        setInputs(prev => ({ ...prev, [person]: "" }));
+      };
+      const toggleTodo = (person, id) => setTodos(prev => ({ ...prev, [person]: prev[person].map(t => t.id === id ? { ...t, done: !t.done } : t) }));
+      const deleteTodo = (person, id) => setTodos(prev => ({ ...prev, [person]: prev[person].filter(t => t.id !== id) }));
+
+      const getStreakAndTotal = (arr) => {
+        const limit = todayIdx < 0 ? 0 : todayIdx >= 7 ? 7 : todayIdx + 1;
+        return { count: arr.slice(0, limit).filter(Boolean).length, total: limit };
+      };
+
+      const weekStatus = isCurrentWeek ? "✦ This Week" : todayIdx === 7 ? `Week ${weekIdx + 1} — done ✓` : `Week ${weekIdx + 1} of ${WEEKS.length}`;
+
+      return (
+        <div style={{ minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 60 }}>
+
+          {/* HEADER */}
+          <div style={{ textAlign: "center", padding: "28px 20px 14px", background: "rgba(255,255,255,0.82)", backdropFilter: "blur(14px)", borderBottom: "1px solid rgba(74,124,89,0.13)", position: "sticky", top: 0, zIndex: 10 }}>
+            <h1 style={{ margin: "0 0 2px", fontSize: "clamp(18px,4vw,29px)", fontWeight: 400, color: "#1b3a28", letterSpacing: "0.04em" }}>
+              🌿 junehee &amp; carolina 🌲
+            </h1>
+            <div style={{ fontSize: 11, color: "#7aaa88", letterSpacing: "0.14em", marginBottom: 13 }}>our little accountability corner</div>
+
+            {/* Week nav */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10 }}>
+              <GradBtn onClick={() => setWeekIdx(i => Math.max(0, i - 1))} disabled={weekIdx === 0}>‹</GradBtn>
+              <div style={{ textAlign: "center", minWidth: 200 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1b3a28" }}>{weekStatus}</div>
+                <div style={{ fontSize: 11, color: "#7aaa88" }}>{week.label}</div>
+              </div>
+              <GradBtn onClick={() => setWeekIdx(i => Math.min(WEEKS.length - 1, i + 1))} disabled={weekIdx === WEEKS.length - 1}>›</GradBtn>
+            </div>
+
+            {/* Dots */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 13, flexWrap: "wrap", maxWidth: 360, margin: "0 auto 13px" }}>
+              {WEEKS.map((w, i) => (
+                <button key={w.key} onClick={() => setWeekIdx(i)} title={w.label}
+                  style={{ width: i === weekIdx ? 20 : 7, height: 7, borderRadius: 4, border: "none", cursor: "pointer", padding: 0, transition: "all 0.22s", flexShrink: 0, background: i === weekIdx ? "#4a7c59" : i < weekIdx ? "#a5d6b0" : "#ddd" }} />
+              ))}
+            </div>
+
+            {/* Tabs */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+              {["habits", "todos"].map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: "7px 22px", borderRadius: 99, border: "1.5px solid", borderColor: activeTab === tab ? "#4a7c59" : "#ccc", background: activeTab === tab ? "#4a7c59" : "white", color: activeTab === tab ? "white" : "#888", fontFamily: "inherit", fontSize: 13, cursor: "pointer", letterSpacing: "0.08em", fontWeight: activeTab === tab ? 700 : 400, transition: "all 0.2s" }}>
+                  {tab === "habits" ? "✦ Habits" : "✦ To-Do Lists"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* HABITS */}
+          {activeTab === "habits" && (
+            <div style={{ maxWidth: 900, margin: "28px auto 0", padding: "0 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 22 }}>
+              {PEOPLE.map(person => {
+                const C = COLORS[person];
+                const grad = `linear-gradient(135deg,${C.g1},${C.g2})`;
+                return (
+                  <div key={person} style={{ background: "white", borderRadius: 22, overflow: "hidden", boxShadow: "0 4px 28px rgba(27,90,53,0.09)", border: `1.5px solid ${C.light}` }}>
+                    <div style={{ background: `linear-gradient(135deg,${C.bg} 0%,white 100%)`, padding: "20px 22px 16px", borderBottom: `1px solid ${C.light}` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ width: 46, height: 46, borderRadius: "50%", background: grad, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{EMOJI[person]}</div>
+                        <div>
+                          <div style={{ fontSize: 19, fontWeight: 700, color: C.dark }}>{DISPLAY[person]}</div>
+                          <div style={{ fontSize: 10, color: C.accent, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+                            {isCurrentWeek ? "this week" : todayIdx === 7 ? "completed" : "upcoming"} · week {weekIdx + 1}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ padding: "18px 20px" }}>
+                      {HABITS.map(habit => {
+                        const { count, total } = getStreakAndTotal(habits[person][habit.id]);
+                        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                        return (
+                          <div key={habit.id} style={{ marginBottom: 22 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: C.dark }}>{habit.label}</span>
+                                {habit.link && (
+                                  <a href={habit.link} target="_blank" rel="noreferrer" title="Watch workout video"
+                                    style={{ display:"inline-flex",alignItems:"center",justifyContent:"center",width:20,height:20,borderRadius:"50%",background:"#ff0000",color:"white",fontSize:8,textDecoration:"none",fontStyle:"normal" }}>▶</a>
+                                )}
+                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: count > 0 ? C.accent : "#ccc" }}>
+                                {count}/{total === 0 ? "–" : total}
+                              </span>
+                            </div>
+
+                            <div style={{ display: "flex", gap: 5 }}>
+                              {DAYS.map((d, i) => {
+                                const checked = habits[person][habit.id][i];
+                                const isToday = isCurrentWeek && i === todayIdx;
+                                const isFutureDay = isCurrentWeek && i > todayIdx;
+                                const isFutureWeek = todayIdx === -1;
+                                const clickable = !isFutureDay && !isFutureWeek;
+                                return (
+                                  <button key={i} onClick={() => clickable && toggleHabit(person, habit.id, i)}
+                                    title={isFutureDay || isFutureWeek ? "Not yet!" : checked ? "Unmark" : "Mark done"}
+                                    style={{
+                                      flex:1, aspectRatio:"1", minWidth:0, borderRadius:9, padding:"4px 0",
+                                      border: isToday ? `2px solid ${C.accent}` : "1.5px solid #e8e8e8",
+                                      background: checked ? grad : isToday ? C.bg : "#fafafa",
+                                      cursor: clickable ? "pointer" : "default",
+                                      opacity: (isFutureDay || isFutureWeek) ? 0.28 : 1,
+                                      display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,
+                                      transition:"all 0.14s",
+                                      boxShadow: checked ? `0 2px 8px ${C.accent}50` : "none",
+                                    }}>
+                                    <span style={{ fontSize:8, color: checked ? "white" : "#bbb", fontWeight:700 }}>{d}</span>
+                                    {checked && <span style={{ fontSize:10, color:"white" }}>✓</span>}
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            <div style={{ marginTop:6, height:3, borderRadius:99, background:"#f0f0f0", overflow:"hidden" }}>
+                              <div style={{ height:"100%", borderRadius:99, background:`linear-gradient(90deg,${C.light},${C.accent})`, width:`${pct}%`, transition:"width 0.4s" }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <div style={{ marginTop:4, padding:"10px 14px", borderRadius:12, background:C.bg, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <span style={{ fontSize:12, color:C.text, fontStyle:"italic" }}>
+                          {isCurrentWeek ? "so far this week" : todayIdx === 7 ? "final score" : "upcoming week"}
+                        </span>
+                        <div style={{ display:"flex", gap:5 }}>
+                          {HABITS.map(h => {
+                            const { count: c, total: t } = getStreakAndTotal(habits[person][h.id]);
+                            const p2 = t > 0 ? Math.round((c/t)*100) : 0;
+                            return (
+                              <span key={h.id} style={{ fontSize:11, color:C.text, background:"white", borderRadius:7, padding:"2px 8px", fontWeight:700 }}>
+                                {h.id==="hydration"?"💧":"🔥"} {t===0?"–":p2+"%"}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* TO-DO */}
+          {activeTab === "todos" && (
+            <div style={{ maxWidth: 900, margin: "28px auto 0", padding: "0 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 22, alignItems: "start" }}>
+              {PEOPLE.map(person => {
+                const C = COLORS[person];
+                const grad = `linear-gradient(135deg,${C.g1},${C.g2})`;
+                const list = todos[person];
+                const done = list.filter(t => t.done).length;
+                const other = DISPLAY[person === "junehee" ? "carolina" : "junehee"];
+                return (
+                  <div key={person} style={{ background:"white", borderRadius:22, overflow:"hidden", boxShadow:"0 4px 28px rgba(27,90,53,0.09)", border:`1.5px solid ${C.light}` }}>
+                    <div style={{ background:`linear-gradient(135deg,${C.bg},white)`, padding:"20px 22px 16px", borderBottom:`1px solid ${C.light}` }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                        <div style={{ width:46, height:46, borderRadius:"50%", background:grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{EMOJI[person]}</div>
+                        <div style={{ flex:1 }}>
+                          <div style={{ fontSize:19, fontWeight:700, color:C.dark }}>{DISPLAY[person]}</div>
+                          <div style={{ fontSize:10, color:C.accent, letterSpacing:"0.16em", textTransform:"uppercase" }}>to-do list</div>
+                        </div>
+                        {list.length > 0 && (
+                          <span style={{ fontSize:11, color:C.text, fontWeight:700, background:C.bg, borderRadius:99, padding:"3px 11px" }}>{done}/{list.length}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ padding:"14px 16px 10px", borderBottom:`1px solid ${C.bg}` }}>
+                      <div style={{ display:"flex", gap:8 }}>
+                        <input value={inputs[person]}
+                          onChange={e => setInputs(p => ({...p,[person]:e.target.value}))}
+                          onKeyDown={e => e.key==="Enter" && addTodo(person)}
+                          placeholder="add something..."
+                          style={{ flex:1, border:"1.5px solid #e8e8e8", borderRadius:10, padding:"8px 12px", fontSize:13, fontFamily:"inherit", outline:"none", color:"#333", background:"#fafafa" }} />
+                        <button onClick={() => addTodo(person)}
+                          style={{ background:grad, color:"white", border:"none", borderRadius:10, padding:"8px 15px", fontSize:16, cursor:"pointer", fontFamily:"inherit" }}>+</button>
+                      </div>
+                    </div>
+
+                    <div style={{ padding:"10px 16px", minHeight:80 }}>
+                      {list.length === 0 && (
+                        <div style={{ textAlign:"center", color:"#ccc", fontSize:13, padding:"22px 0", fontStyle:"italic" }}>nothing here yet ✨</div>
+                      )}
+                      {list.map(todo => (
+                        <div key={todo.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:10, marginBottom:5, background:todo.done?"#fafafa":"white", border:"1px solid", borderColor:todo.done?"#f0f0f0":"#efefef", transition:"all 0.2s" }}>
+                          <button onClick={() => toggleTodo(person, todo.id)}
+                            style={{ width:20, height:20, borderRadius:6, padding:0, border:`2px solid ${todo.done?C.accent:"#ddd"}`, background:todo.done?C.accent:"white", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:11, color:"white" }}>
+                            {todo.done?"✓":""}
+                          </button>
+                          <span style={{ flex:1, fontSize:13, color:todo.done?"#bbb":"#333", textDecoration:todo.done?"line-through":"none", lineHeight:1.4 }}>{todo.text}</span>
+                          <button onClick={() => deleteTodo(person, todo.id)}
+                            style={{ background:"none", border:"none", color:"#ddd", cursor:"pointer", fontSize:16, padding:"0 2px", lineHeight:1 }}>×</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ padding:"6px 16px 14px", fontSize:11, color:"#bbb", fontStyle:"italic", textAlign:"center" }}>
+                      {other} can see this too 👀
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<Dashboard />);
+  </script>
+</body>
+</html>
