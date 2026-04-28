@@ -54,7 +54,6 @@
       gap: 20px; align-items: start;
     }
 
-    /* ── CARD ── */
     .card { background: var(--white); border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
     .card-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
     .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
@@ -87,7 +86,7 @@
     .summary-pills { display: flex; gap: 4px; }
     .summary-pill { font-size: 11px; font-weight: 700; background: white; border-radius: 6px; padding: 2px 8px; }
 
-    /* ── TODO INPUT ── */
+    /* ── TODO ── */
     .todo-input-wrap { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); }
     .todo-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .todo-input {
@@ -98,23 +97,19 @@
     .todo-input:focus { border-color: #3a7bd5; }
     .todo-add { border: none; border-radius: 9px; padding: 8px 14px; font-size: 17px; cursor: pointer; color: white; flex-shrink: 0; }
 
-    /* Day picker row */
     .day-picker { display: flex; gap: 4px; }
     .day-pick-btn {
       flex: 1; padding: 5px 2px; border-radius: 7px; border: 1.5px solid #eee;
       background: #fafafa; font-size: 10px; font-weight: 700; color: #bbb;
-      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s;
-      text-align: center;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s; text-align: center;
     }
     .day-pick-btn.selected { color: white; border-color: transparent; }
-    .day-pick-btn.none-btn { flex: none; padding: 5px 10px; color: #ccc; font-size: 10px; }
-    .day-pick-btn.none-btn.selected { background: #eee; color: #999; }
+    .day-pick-btn.any-btn { flex: none; padding: 5px 10px; font-size: 10px; }
+    .day-pick-btn.any-btn.selected { background: #eee !important; color: #999 !important; }
 
-    /* ── TODO LIST ── */
     .todo-list { padding: 8px 14px 4px; min-height: 60px; }
     .todo-empty { text-align: center; color: #ccc; font-size: 13px; padding: 20px 0; font-style: italic; }
 
-    /* Day group header */
     .day-group-header {
       font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--muted); margin: 10px 0 5px; padding-left: 2px;
@@ -135,15 +130,10 @@
     }
     .todo-text { flex: 1; font-size: 13px; color: #333; line-height: 1.4; }
     .todo-item.done .todo-text { text-decoration: line-through; color: #bbb; }
-    .todo-day-badge {
-      font-size: 10px; font-weight: 700; border-radius: 5px;
-      padding: 2px 7px; flex-shrink: 0; opacity: 0.85;
-    }
-    .todo-del { background: none; border: none; color: #ddd; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; transition: color 0.12s; }
+    .todo-del { background: none; border: none; color: #ddd; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; }
     .todo-del:hover { color: #aaa; }
     .todo-footer { padding: 6px 16px 13px; font-size: 11px; color: #ccc; font-style: italic; text-align: center; }
 
-    /* ── SYNC / LOADING ── */
     #sync-bar {
       position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       background: #1a2e22; color: white; font-size: 12px; padding: 6px 16px;
@@ -161,7 +151,6 @@
 <body>
 
 <div id="loading">🌿 loading...</div>
-
 <div id="app" style="display:none">
   <div id="header">
     <h1>🌿 junehee &amp; carolina 🌲</h1>
@@ -182,7 +171,6 @@
   </div>
   <div id="main"></div>
 </div>
-
 <div id="sync-bar">✓ Synced</div>
 
 <script type="module">
@@ -196,14 +184,13 @@
     projectId: "habittracker111",
     storageBucket: "habittracker111.firebasestorage.app",
     messagingSenderId: "620422128795",
-    appId: "1:620422128795:web:36b2e1bb5316067c11123e",
-    measurementId: "G-RRSZLE8B6M"
+    appId: "1:620422128795:web:36b2e1bb5316067c11123e"
   };
 
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  // ── WEEKS ──
+  // ── WEEKS: April 20 – July 31 2026 ──
   const WEEKS = (() => {
     const weeks = [];
     const start = new Date(2026, 3, 20);
@@ -222,13 +209,22 @@
     return weeks;
   })();
 
+  // Compute ISO date string (YYYY-MM-DD) for each day of a week
+  function weekDates(weekMon) {
+    return Array.from({length:7}, (_,i) => {
+      const d = new Date(weekMon);
+      d.setDate(weekMon.getDate() + i);
+      return d.toISOString().slice(0,10);
+    });
+  }
+
   const HABITS  = [
-    { id:"hydration", label:"Hydration" },
-    { id:"abs", label:"Abs", link:"https://www.youtube.com/watch?v=2pLT-olgUJs&t=48s" },
+    { id:"hydration", label:"Hydration 💧" },
+    { id:"abs", label:"Abs 🔥", link:"https://www.youtube.com/watch?v=2pLT-olgUJs&t=48s" },
   ];
   const PEOPLE  = ["junehee","carolina"];
-  const DAYS    = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   const DAYS_S  = ["M","T","W","T","F","S","S"];
+  const DAYS_L  = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   const COLORS  = {
     junehee: { bg:"#e8f0fb", accent:"#3a7bd5", light:"#b8d0f5", dark:"#1e4fa3", text:"#1e3a6e" },
     carolina: { bg:"#d8eedd", accent:"#1b6b3a", light:"#9ecfaf", dark:"#0a2818", text:"#14472a" },
@@ -240,9 +236,9 @@
   let weekIdx   = 0;
   let activeTab = "habits";
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
-  // per-person pending input state
   let pendingText = { junehee:"", carolina:"" };
-  let pendingDay  = { junehee: null, carolina: null }; // null = no specific day
+  // pendingDate[person] = "YYYY-MM-DD" or null (anytime)
+  let pendingDate = { junehee:null, carolina:null };
 
   function getTodayIndex(weekMon) {
     const now = new Date(); now.setHours(0,0,0,0);
@@ -257,20 +253,19 @@
     },{});
   }
 
-  // ── SYNC FLASH ──
   function flashSync() {
     const bar = document.getElementById("sync-bar");
     bar.classList.add("show");
-    setTimeout(() => bar.classList.remove("show"), 1800);
+    setTimeout(()=>bar.classList.remove("show"),1800);
   }
 
-  // ── FIREBASE ──
-  function writeHabit(weekKey, person, habitId, dayIdx, val) {
-    set(ref(db, `habits/${weekKey}/${person}/${habitId}/${dayIdx}`), val);
+  function writeHabit(weekKey,person,habitId,dayIdx,val) {
+    set(ref(db,`habits/${weekKey}/${person}/${habitId}/${dayIdx}`),val);
     flashSync();
   }
-  function writeTodos(person, list) {
-    set(ref(db, `todos/${person}`), list);
+
+  function writeTodos(person,list) {
+    set(ref(db,`todos/${person}`),list);
     flashSync();
   }
 
@@ -278,8 +273,8 @@
   function render() { renderHeader(); renderMain(); }
 
   function renderHeader() {
-    const week = WEEKS[weekIdx];
-    const isNow = weekIdx === 0;
+    const week  = WEEKS[weekIdx];
+    const isNow = weekIdx===0;
     const todayI = getTodayIndex(week.mon);
     document.getElementById("week-status").textContent =
       isNow ? "✦ This Week" :
@@ -290,24 +285,24 @@
     document.getElementById("next-btn").disabled = weekIdx===WEEKS.length-1;
 
     const dotsEl = document.getElementById("dots");
-    dotsEl.innerHTML = "";
+    dotsEl.innerHTML="";
     WEEKS.forEach((w,i) => {
       const d = document.createElement("button");
       d.className="dot"; d.title=w.label;
       d.style.width = i===weekIdx?"20px":"7px";
       d.style.background = i===weekIdx?"#1b6b3a":i<weekIdx?"#9ecfaf":"#ddd";
-      d.onclick = () => { weekIdx=i; render(); };
+      d.onclick = ()=>{ weekIdx=i; render(); };
       dotsEl.appendChild(d);
     });
   }
 
   function renderMain() {
     const main = document.getElementById("main");
-    main.innerHTML = "";
+    main.innerHTML="";
     if (activeTab==="habits") {
-      PEOPLE.forEach(p => main.appendChild(buildHabitCard(p)));
+      PEOPLE.forEach(p=>main.appendChild(buildHabitCard(p)));
     } else {
-      PEOPLE.forEach(p => main.appendChild(buildTodoCard(p)));
+      PEOPLE.forEach(p=>main.appendChild(buildTodoCard(p)));
     }
   }
 
@@ -317,12 +312,12 @@
     const week = WEEKS[weekIdx];
     const isNow = weekIdx===0;
     const todayI = getTodayIndex(week.mon);
-    const weekHabits = remoteData.habits[week.key] || emptyWeekHabits();
+    const weekHabits = remoteData.habits[week.key]||emptyWeekHabits();
 
     const card = el("div","card");
     const head = el("div","card-head");
-    head.style.background = `linear-gradient(135deg,${C.bg} 0%,white 100%)`;
-    head.innerHTML = `
+    head.style.background=`linear-gradient(135deg,${C.bg} 0%,white 100%)`;
+    head.innerHTML=`
       <div class="avatar" style="background:${C.accent};color:white">${EMOJI[person]}</div>
       <div>
         <div class="card-name" style="color:${C.dark}">${DISPLAY[person]}</div>
@@ -339,7 +334,7 @@
       const pct   = limit>0?Math.round((count/limit)*100):0;
 
       const row = el("div","habit-row");
-      row.innerHTML = `
+      row.innerHTML=`
         <div class="habit-top">
           <div class="habit-label" style="color:${C.dark}">
             ${habit.label}
@@ -352,26 +347,25 @@
       body.appendChild(row);
 
       const tilesWrap = row.querySelector(`#dt-${person}-${habit.id}`);
-      DAYS_S.forEach((d,i) => {
+      DAYS_S.forEach((d,i)=>{
         const checked = arr[i]===true;
         const isToday = isNow&&i===todayI;
         const locked  = (isNow&&i>todayI)||(todayI===-1);
         const btn = el("button","day-tile"+(checked?" checked":"")+(isToday?" today":"")+(locked?" locked":""));
-        btn.innerHTML = `<span class="dl">${d}</span><span class="dc">✓</span>`;
-        btn.disabled = locked;
-        if (checked)      { btn.style.background=C.accent; btn.style.borderColor=C.accent; }
-        else if (isToday) { btn.style.borderColor=C.accent; btn.style.background=C.bg; }
-        if (!locked) btn.onclick = () => writeHabit(week.key,person,habit.id,i,!arr[i]);
+        btn.innerHTML=`<span class="dl">${d}</span><span class="dc">✓</span>`;
+        btn.disabled=locked;
+        if (checked)      {btn.style.background=C.accent;btn.style.borderColor=C.accent;}
+        else if (isToday) {btn.style.borderColor=C.accent;btn.style.background=C.bg;}
+        if (!locked) btn.onclick=()=>writeHabit(week.key,person,habit.id,i,!arr[i]);
         tilesWrap.appendChild(btn);
       });
     });
 
-    // Summary
     const sum = el("div","summary");
-    sum.style.background = C.bg;
+    sum.style.background=C.bg;
     const wh2 = remoteData.habits[WEEKS[weekIdx].key]||emptyWeekHabits();
     const ti2 = getTodayIndex(WEEKS[weekIdx].mon);
-    sum.innerHTML = `
+    sum.innerHTML=`
       <span class="summary-label" style="color:${C.text}">${isNow?"so far this week":ti2===7?"final score":"upcoming week"}</span>
       <div class="summary-pills">
         ${HABITS.map(h=>{
@@ -379,7 +373,7 @@
           const l2=ti2<0?0:ti2>=7?7:ti2+1;
           const c2=a2.slice(0,l2).filter(Boolean).length;
           const p2=l2>0?Math.round((c2/l2)*100):0;
-          return `<span class="summary-pill" style="color:${C.text}">${h.id==="hydration"?"💧":"🔥"} ${l2===0?"–":p2+"%"}</span>`;
+          return`<span class="summary-pill" style="color:${C.text}">${h.id==="hydration"?"💧":"🔥"} ${l2===0?"–":p2+"%"}</span>`;
         }).join("")}
       </div>`;
     body.appendChild(sum);
@@ -391,67 +385,76 @@
   function buildTodoCard(person) {
     const C    = COLORS[person];
     const week = WEEKS[weekIdx];
-    const raw  = remoteData.todos&&remoteData.todos[person];
-    const all  = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
-    // Show all todos (not filtered by week — they have a day label for the current week view)
-    const done = all.filter(t=>t.done).length;
+    const dates = weekDates(week.mon); // ["2026-04-20", ..., "2026-04-26"]
+    const weekStart = dates[0];
+    const weekEnd   = dates[6];
+
+    const raw = remoteData.todos&&remoteData.todos[person];
+    const all = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
+
+    // Only show tasks that belong to THIS week:
+    // - tasks with a specific date inside this week's range
+    // - tasks with no date (anytime) added this week (use weekKey stored on task)
+    // - also show undated tasks that have no weekKey (legacy) always
+    const weekTasks = all.filter(t => {
+      if (t.date) {
+        // Has a specific date — show only if it falls in this week
+        return t.date >= weekStart && t.date <= weekEnd;
+      } else {
+        // Undated — show if task was created this week, or has no weekKey (legacy)
+        return !t.weekKey || t.weekKey === week.key;
+      }
+    });
+
+    const done  = weekTasks.filter(t=>t.done).length;
     const other = DISPLAY[person==="junehee"?"carolina":"junehee"];
 
     const card = el("div","card");
 
     // Header
     const head = el("div","card-head");
-    head.style.background = `linear-gradient(135deg,${C.bg} 0%,white 100%)`;
-    head.innerHTML = `
+    head.style.background=`linear-gradient(135deg,${C.bg} 0%,white 100%)`;
+    head.innerHTML=`
       <div class="avatar" style="background:${C.accent};color:white">${EMOJI[person]}</div>
       <div style="flex:1">
         <div class="card-name" style="color:${C.dark}">${DISPLAY[person]}</div>
         <div class="card-sub" style="color:${C.accent}">to-do list</div>
       </div>
-      ${all.length>0?`<span style="font-size:11px;font-weight:700;color:${C.text};background:${C.bg};border-radius:99px;padding:3px 11px">${done}/${all.length}</span>`:""}`;
+      ${weekTasks.length>0?`<span style="font-size:11px;font-weight:700;color:${C.text};background:${C.bg};border-radius:99px;padding:3px 11px">${done}/${weekTasks.length}</span>`:""}`;
     card.appendChild(head);
 
-    // ── Input area ──
+    // ── Input ──
     const inputWrap = el("div","todo-input-wrap");
-
-    // Text + add button row
-    const inputRow = el("div","todo-input-row");
+    const inputRow  = el("div","todo-input-row");
     const inp = document.createElement("input");
     inp.className="todo-input"; inp.placeholder="add a task...";
-    inp.value = pendingText[person];
-    inp.oninput = e => { pendingText[person]=e.target.value; };
-    inp.onkeydown = e => { if(e.key==="Enter") doAdd(person,inp); };
-
-    const addBtn = el("button","todo-add");
-    addBtn.style.background = C.accent;
-    addBtn.textContent="+";
-    addBtn.onclick = () => doAdd(person,inp);
+    inp.value=pendingText[person];
+    inp.oninput=e=>{pendingText[person]=e.target.value;};
+    inp.onkeydown=e=>{if(e.key==="Enter")doAdd(person,inp);};
+    const addBtn=el("button","todo-add");
+    addBtn.style.background=C.accent; addBtn.textContent="+";
+    addBtn.onclick=()=>doAdd(person,inp);
     inputRow.appendChild(inp); inputRow.appendChild(addBtn);
     inputWrap.appendChild(inputRow);
 
-    // Day picker
+    // Day picker — shows actual dates for this week
     const picker = el("div","day-picker");
-    // "No day" option
-    const noneBtn = el("button","day-pick-btn none-btn");
-    noneBtn.textContent = "any";
-    if (pendingDay[person]===null) {
-      noneBtn.classList.add("selected");
-      noneBtn.style.background="#eee"; noneBtn.style.color="#999";
-    }
-    noneBtn.onclick = () => { pendingDay[person]=null; renderMain(); };
-    picker.appendChild(noneBtn);
+    const anyBtn = el("button","day-pick-btn any-btn");
+    anyBtn.textContent="any";
+    if (pendingDate[person]===null) { anyBtn.classList.add("selected"); }
+    anyBtn.onclick=()=>{pendingDate[person]=null;renderMain();};
+    picker.appendChild(anyBtn);
 
-    DAYS.forEach((d,i) => {
+    dates.forEach((dateStr,i)=>{
       const btn = el("button","day-pick-btn");
-      btn.textContent = d;
-      const isSelected = pendingDay[person]===i;
+      btn.textContent = DAYS_L[i].slice(0,3);
+      const isSelected = pendingDate[person]===dateStr;
       if (isSelected) {
         btn.classList.add("selected");
-        btn.style.background = C.accent;
-        btn.style.color = "white";
+        btn.style.background=C.accent; btn.style.color="white";
       }
-      btn.onclick = () => {
-        pendingDay[person] = pendingDay[person]===i ? null : i;
+      btn.onclick=()=>{
+        pendingDate[person] = pendingDate[person]===dateStr ? null : dateStr;
         renderMain();
       };
       picker.appendChild(btn);
@@ -459,111 +462,99 @@
     inputWrap.appendChild(picker);
     card.appendChild(inputWrap);
 
-    // ── Todo list grouped by day ──
+    // ── List grouped by date ──
     const listEl = el("div","todo-list");
 
-    if (all.length===0) {
-      listEl.innerHTML=`<div class="todo-empty">nothing here yet ✨</div>`;
+    if (weekTasks.length===0) {
+      listEl.innerHTML=`<div class="todo-empty">nothing this week yet ✨</div>`;
     } else {
-      // Group: undated first, then Mon–Sun
-      const groups = { null:[], 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-      all.forEach(t => {
-        const key = (t.day !== undefined && t.day !== null) ? t.day : null;
-        if (groups[key] !== undefined) groups[key].push(t);
-        else groups[null].push(t);
+      // Group: undated first, then by actual date Mon→Sun
+      const undated = weekTasks.filter(t=>!t.date);
+      const byDate  = {};
+      dates.forEach(d=>{ byDate[d]=[]; });
+      weekTasks.filter(t=>t.date).forEach(t=>{
+        if (byDate[t.date]) byDate[t.date].push(t);
       });
 
-      // Render undated
-      if (groups[null].length > 0) {
-        const hdr = el("div","day-group-header");
-        hdr.textContent = "· anytime";
+      if (undated.length>0) {
+        const hdr=el("div","day-group-header");
+        hdr.textContent="· anytime";
         listEl.appendChild(hdr);
-        groups[null].forEach(todo => listEl.appendChild(buildTodoItem(todo, all, person, C, null)));
+        undated.forEach(todo=>listEl.appendChild(buildTodoItem(todo,all,person,C)));
       }
 
-      // Render Mon–Sun
-      DAYS.forEach((dayName, i) => {
-        if (groups[i] && groups[i].length > 0) {
-          // Get the actual date for this day in the current week
-          const dayDate = new Date(week.mon);
-          dayDate.setDate(week.mon.getDate() + i);
-          const dateStr = dayDate.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-
-          const hdr = el("div","day-group-header");
-          hdr.textContent = `· ${dayName} ${dateStr}`;
+      dates.forEach((dateStr,i)=>{
+        if (byDate[dateStr]&&byDate[dateStr].length>0) {
+          const d = new Date(dateStr+"T12:00:00");
+          const label = d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+          const hdr=el("div","day-group-header");
+          hdr.textContent=`· ${label}`;
           listEl.appendChild(hdr);
-          groups[i].forEach(todo => listEl.appendChild(buildTodoItem(todo, all, person, C, i)));
+          byDate[dateStr].forEach(todo=>listEl.appendChild(buildTodoItem(todo,all,person,C)));
         }
       });
     }
     card.appendChild(listEl);
 
-    const footer = el("div","todo-footer");
-    footer.textContent = `${other} can see this too 👀`;
+    const footer=el("div","todo-footer");
+    footer.textContent=`${other} can see this too 👀`;
     card.appendChild(footer);
     return card;
   }
 
-  function buildTodoItem(todo, allList, person, C, dayIdx) {
-    const item = el("div","todo-item"+(todo.done?" done":""));
-
-    const chk = el("button","todo-check");
-    chk.style.borderColor = todo.done?C.accent:"#ddd";
-    chk.style.background  = todo.done?C.accent:"white";
-    chk.textContent = todo.done?"✓":"";
-    chk.onclick = () => writeTodos(person, allList.map(t=>t.id===todo.id?{...t,done:!t.done}:t));
-
-    const txt = el("span","todo-text");
-    txt.textContent = todo.text;
-
-    const del = el("button","todo-del");
+  function buildTodoItem(todo,allList,person,C) {
+    const item=el("div","todo-item"+(todo.done?" done":""));
+    const chk=el("button","todo-check");
+    chk.style.borderColor=todo.done?C.accent:"#ddd";
+    chk.style.background=todo.done?C.accent:"white";
+    chk.textContent=todo.done?"✓":"";
+    chk.onclick=()=>writeTodos(person,allList.map(t=>t.id===todo.id?{...t,done:!t.done}:t));
+    const txt=el("span","todo-text");
+    txt.textContent=todo.text;
+    const del=el("button","todo-del");
     del.textContent="×";
-    del.onclick = () => writeTodos(person, allList.filter(t=>t.id!==todo.id));
-
-    item.appendChild(chk);
-    item.appendChild(txt);
-    item.appendChild(del);
+    del.onclick=()=>writeTodos(person,allList.filter(t=>t.id!==todo.id));
+    item.appendChild(chk); item.appendChild(txt); item.appendChild(del);
     return item;
   }
 
-  function doAdd(person, inp) {
-    const text = (inp.value||pendingText[person]||"").trim();
+  function doAdd(person,inp) {
+    const text=(inp.value||pendingText[person]||"").trim();
     if (!text) return;
-    const raw  = remoteData.todos&&remoteData.todos[person];
-    const list = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
-    const newTodo = { id:Date.now(), text, done:false };
-    if (pendingDay[person]!==null) newTodo.day = pendingDay[person];
-    writeTodos(person, [...list, newTodo]);
-    inp.value="";
-    pendingText[person]="";
-    pendingDay[person]=null;
+    const raw=remoteData.todos&&remoteData.todos[person];
+    const list=Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
+    const week=WEEKS[weekIdx];
+    const newTodo={id:Date.now(),text,done:false,weekKey:week.key};
+    if (pendingDate[person]!==null) {
+      newTodo.date=pendingDate[person]; // store actual "YYYY-MM-DD"
+    }
+    writeTodos(person,[...list,newTodo]);
+    inp.value=""; pendingText[person]=""; pendingDate[person]=null;
   }
 
-  function el(tag,cls) { const e=document.createElement(tag); if(cls)e.className=cls; return e; }
+  function el(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
 
-  // ── FIREBASE LISTENER ──
-  onValue(ref(db,"/"), snap => {
-    const val = snap.val();
-    if (val) {
-      remoteData = val;
-      if (!remoteData.todos)  remoteData.todos  = {junehee:[],carolina:[]};
-      if (!remoteData.habits) remoteData.habits = {};
+  // ── FIREBASE ──
+  onValue(ref(db,"/"),snap=>{
+    const val=snap.val();
+    if(val){
+      remoteData=val;
+      if(!remoteData.todos)  remoteData.todos ={junehee:[],carolina:[]};
+      if(!remoteData.habits) remoteData.habits={};
     }
     document.getElementById("loading").style.display="none";
     document.getElementById("app").style.display="block";
     render();
   });
 
-  // ── CONTROLS ──
-  document.querySelectorAll(".tab").forEach(btn => {
-    btn.onclick = () => {
+  document.querySelectorAll(".tab").forEach(btn=>{
+    btn.onclick=()=>{
       document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      activeTab=btn.dataset.tab; render();
+      btn.classList.add("active"); activeTab=btn.dataset.tab; render();
     };
   });
-  document.getElementById("prev-btn").onclick = () => { if(weekIdx>0){weekIdx--;render();} };
-  document.getElementById("next-btn").onclick = () => { if(weekIdx<WEEKS.length-1){weekIdx++;render();} };
+  document.getElementById("prev-btn").onclick=()=>{if(weekIdx>0){weekIdx--;render();}};
+  document.getElementById("next-btn").onclick=()=>{if(weekIdx<WEEKS.length-1){weekIdx++;render();}};
 </script>
 </body>
 </html>
