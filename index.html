@@ -195,31 +195,35 @@
   function todayStr() { return localDateStr(new Date()); }
 
   // ── WEEKS: April 20 – July 31 2026 ──
+  // Built purely from date strings to avoid timezone shifts
+  function addDays(dateStr, n) {
+    const d = new Date(dateStr + 'T12:00:00'); // noon avoids DST edge cases
+    d.setDate(d.getDate() + n);
+    return d.toLocaleDateString('en-CA', {timeZone:'America/New_York'});
+  }
+  function fmtLabel(dateStr) {
+    return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', timeZone:'America/New_York'});
+  }
   const WEEKS = (() => {
     const weeks = [];
-    const start = new Date(2026, 3, 20);
-    const end   = new Date(2026, 6, 31);
-    let cur = new Date(start);
-    while (cur <= end) {
-      const mon = new Date(cur);
-      const sun = new Date(cur); sun.setDate(mon.getDate() + 6);
+    let monStr = '2026-04-20';
+    const endStr = '2026-07-31';
+    while (monStr <= endStr) {
+      const sunStr = addDays(monStr, 6);
       weeks.push({
-        key: localDateStr(mon), mon, sun,
-        label: mon.toLocaleDateString("en-US",{month:"short",day:"numeric"}) +
-               " – " + sun.toLocaleDateString("en-US",{month:"short",day:"numeric"})
+        key: monStr,
+        mon: monStr,
+        sun: sunStr,
+        label: fmtLabel(monStr) + ' – ' + fmtLabel(sunStr)
       });
-      cur.setDate(cur.getDate() + 7);
+      monStr = addDays(monStr, 7);
     }
     return weeks;
   })();
 
-  // Compute ISO date string (YYYY-MM-DD) for each day of a week
+  // Compute date strings for each day of a week
   function weekDates(weekMon) {
-    return Array.from({length:7}, (_,i) => {
-      const d = new Date(weekMon);
-      d.setDate(weekMon.getDate() + i);
-      return localDateStr(d);
-    });
+    return Array.from({length:7}, (_,i) => addDays(weekMon, i));
   }
 
   const HABITS  = [
@@ -237,7 +241,7 @@
   const DISPLAY = { junehee:"Junehee", carolina:"Carolina" };
 
   // ── STATE ──
-  let weekIdx = (()=>{ const now=new Date(); const day=now.getDay(); const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1)); const key=localDateStr(mon); const i=WEEKS.findIndex(w=>w.key===key); return i>=0?i:0; })();
+  let weekIdx = (()=>{ const now=new Date(); const day=now.getDay(); const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1)); const key=mon.toLocaleDateString("en-CA",{timeZone:"America/New_York"}); const i=WEEKS.findIndex(w=>w.key===key); return i>=0?i:0; })();
   let activeTab = "habits";
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
   let pendingText = { junehee:"", carolina:"" };
@@ -277,7 +281,7 @@
 
   function renderHeader() {
     const week  = WEEKS[weekIdx];
-    const isNow = todayStr()>=week.key&&todayStr()<=localDateStr(week.sun);
+    const isNow = todayStr()>=week.key&&todayStr()<=week.sun;
     const todayI = getTodayIndex(week.mon);
     document.getElementById("week-status").textContent =
       isNow ? "✦ This Week" :
@@ -313,7 +317,7 @@
   function buildHabitCard(person) {
     const C = COLORS[person];
     const week = WEEKS[weekIdx];
-    const isNow = todayStr()>=week.key&&todayStr()<=localDateStr(week.sun);
+    const isNow = todayStr()>=week.key&&todayStr()<=week.sun;
     const todayI = getTodayIndex(week.mon);
     const weekHabits = remoteData.habits[week.key]||emptyWeekHabits();
 
@@ -529,7 +533,7 @@
       newTodo.date=pendingDate[person]; // store actual "YYYY-MM-DD"
     }
     writeTodos(person,[...list,newTodo]);
-    const wk=WEEKS[weekIdx]; const todayInWk=todayStr()>=wk.key&&todayStr()<=localDateStr(wk.sun); inp.value=""; pendingText[person]=""; pendingDate[person]=todayInWk?todayStr():wk.key;
+    const wk=WEEKS[weekIdx]; const todayInWk=todayStr()>=wk.key&&todayStr()<=wk.sun; inp.value=""; pendingText[person]=""; pendingDate[person]=todayInWk?todayStr():wk.key;
   }
 
   function el(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
