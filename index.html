@@ -237,7 +237,7 @@
   const DISPLAY = { junehee:"Junehee", carolina:"Carolina" };
 
   // ── STATE ──
-  let weekIdx = (()=>{ const now=new Date(); now.setHours(12,0,0,0); for(let i=0;i<WEEKS.length;i++){ const m=new Date(WEEKS[i].mon); m.setHours(0,0,0,0); const s=new Date(WEEKS[i].sun); s.setHours(23,59,59,999); if(now>=m && now<=s) return i; } return 0; })();
+  let weekIdx = (()=>{ const now=new Date(); const day=now.getDay(); const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1)); const key=localDateStr(mon); const i=WEEKS.findIndex(w=>w.key===key); return i>=0?i:0; })();
   let activeTab = "habits";
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
   let pendingText = { junehee:"", carolina:"" };
