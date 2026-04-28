@@ -393,16 +393,13 @@
     const all = Array.isArray(raw)?raw:(raw?Object.values(raw):[]);
 
     // Only show tasks that belong to THIS week:
-    // - tasks with a specific date inside this week's range
-    // - tasks with no date (anytime) added this week (use weekKey stored on task)
-    // - also show undated tasks that have no weekKey (legacy) always
+    // - tasks with a specific date: only if that date falls within this week
+    // - tasks without a date: only if their weekKey matches this week
     const weekTasks = all.filter(t => {
       if (t.date) {
-        // Has a specific date — show only if it falls in this week
         return t.date >= weekStart && t.date <= weekEnd;
       } else {
-        // Undated — show if task was created this week, or has no weekKey (legacy)
-        return !t.weekKey || t.weekKey === week.key;
+        return t.weekKey === week.key;
       }
     });
 
