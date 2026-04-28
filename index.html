@@ -238,7 +238,8 @@
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
   let pendingText = { junehee:"", carolina:"" };
   // pendingDate[person] = "YYYY-MM-DD" or null (anytime)
-  let pendingDate = { junehee:null, carolina:null };
+  function todayStr() { return new Date().toISOString().slice(0,10); }
+  let pendingDate = { junehee:todayStr(), carolina:todayStr() };
 
   function getTodayIndex(weekMon) {
     const now = new Date(); now.setHours(0,0,0,0);
@@ -526,7 +527,7 @@
       newTodo.date=pendingDate[person]; // store actual "YYYY-MM-DD"
     }
     writeTodos(person,[...list,newTodo]);
-    inp.value=""; pendingText[person]=""; pendingDate[person]=null;
+    const wk=WEEKS[weekIdx]; const todayInWk=todayStr()>=wk.key&&todayStr()<=wk.sun.toISOString().slice(0,10); inp.value=""; pendingText[person]=""; pendingDate[person]=todayInWk?todayStr():wk.key;
   }
 
   function el(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
