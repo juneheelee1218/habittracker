@@ -238,7 +238,7 @@
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
   let pendingText = { junehee:"", carolina:"" };
   // pendingDate[person] = "YYYY-MM-DD" or null (anytime)
-  function localDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function localDateStr(d) { return d.toLocaleDateString('en-CA', {timeZone:'America/New_York'}); }
   function todayStr() { return localDateStr(new Date()); }
   let pendingDate = { junehee:todayStr(), carolina:todayStr() };
 
