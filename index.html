@@ -200,7 +200,7 @@
       const mon = new Date(cur);
       const sun = new Date(cur); sun.setDate(mon.getDate() + 6);
       weeks.push({
-        key: mon.toISOString().slice(0,10), mon, sun,
+        key: localDateStr(mon), mon, sun,
         label: mon.toLocaleDateString("en-US",{month:"short",day:"numeric"}) +
                " – " + sun.toLocaleDateString("en-US",{month:"short",day:"numeric"})
       });
@@ -214,7 +214,7 @@
     return Array.from({length:7}, (_,i) => {
       const d = new Date(weekMon);
       d.setDate(weekMon.getDate() + i);
-      return d.toISOString().slice(0,10);
+      return localDateStr(d);
     });
   }
 
@@ -238,7 +238,8 @@
   let remoteData = { habits:{}, todos:{ junehee:[], carolina:[] } };
   let pendingText = { junehee:"", carolina:"" };
   // pendingDate[person] = "YYYY-MM-DD" or null (anytime)
-  function todayStr() { return new Date().toISOString().slice(0,10); }
+  function localDateStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function todayStr() { return localDateStr(new Date()); }
   let pendingDate = { junehee:todayStr(), carolina:todayStr() };
 
   function getTodayIndex(weekMon) {
@@ -527,7 +528,7 @@
       newTodo.date=pendingDate[person]; // store actual "YYYY-MM-DD"
     }
     writeTodos(person,[...list,newTodo]);
-    const wk=WEEKS[weekIdx]; const todayInWk=todayStr()>=wk.key&&todayStr()<=wk.sun.toISOString().slice(0,10); inp.value=""; pendingText[person]=""; pendingDate[person]=todayInWk?todayStr():wk.key;
+    const wk=WEEKS[weekIdx]; const todayInWk=todayStr()>=wk.key&&todayStr()<=localDateStr(wk.sun); inp.value=""; pendingText[person]=""; pendingDate[person]=todayInWk?todayStr():wk.key;
   }
 
   function el(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
