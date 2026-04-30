@@ -146,9 +146,118 @@
       display: flex; align-items: center; justify-content: center;
       font-family: 'DM Serif Display', serif; font-size: 22px; color: #1b6b3a; z-index: 999;
     }
+
+    #lock-screen {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; font-family: 'DM Sans', sans-serif;
+    }
+    #lock-box {
+      background: white; border-radius: 24px; padding: 40px 36px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08); text-align: center;
+      max-width: 340px; width: 100%;
+    }
+    #lock-box h2 { font-family: 'DM Serif Display', serif; font-size: 26px; color: #0f2019; margin-bottom: 6px; }
+    #lock-box p { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .pin-dots { display: flex; justify-content: center; gap: 14px; margin-bottom: 28px; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc; background: white; transition: all 0.15s; }
+    .pin-dot.filled { background: var(--c); border-color: var(--c); }
+    .pin-dot.error { background: #e53e3e; border-color: #e53e3e; }
+    .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 240px; margin: 0 auto; }
+    .pin-key {
+      padding: 16px; border-radius: 14px; border: 1.5px solid var(--border);
+      background: white; font-size: 20px; font-weight: 600; color: #1a2e22;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.1s;
+    }
+    .pin-key:hover { background: var(--c-bg); border-color: var(--c-light); }
+    .pin-key:active { transform: scale(0.94); }
+    .pin-key.del { font-size: 16px; color: var(--muted); }
+    #lock-error { font-size: 12px; color: #e53e3e; margin-top: 14px; height: 16px; }
   </style>
 </head>
 <body>
+
+
+<div id="lock-screen">
+  <div id="lock-box">
+    <h2>🌿 hey there</h2>
+    <p>enter the pin to continue</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <div></div>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div id="lock-error"></div>
+  </div>
+</div>
+
+<script>
+  const CORRECT_PIN = '2221';
+  let pinEntry = '';
+
+  // Auto-unlock if already authenticated this session
+  if (sessionStorage.getItem('jc_unlocked') === 'yes') {
+    document.getElementById('lock-screen').style.display = 'none';
+  }
+
+  function pinPress(digit) {
+    if (pinEntry.length >= 4) return;
+    pinEntry += digit;
+    updateDots();
+    if (pinEntry.length === 4) checkPin();
+  }
+
+  function pinDel() {
+    pinEntry = pinEntry.slice(0, -1);
+    updateDots();
+    document.getElementById('lock-error').textContent = '';
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('d' + i);
+      dot.classList.toggle('filled', i < pinEntry.length);
+      dot.classList.remove('error');
+    }
+  }
+
+  function checkPin() {
+    if (pinEntry === CORRECT_PIN) {
+      sessionStorage.setItem('jc_unlocked', 'yes');
+      document.getElementById('lock-screen').style.display = 'none';
+    } else {
+      document.querySelectorAll('.pin-dot').forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+      document.getElementById('lock-error').textContent = 'wrong pin, try again';
+      setTimeout(() => {
+        document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
+        document.getElementById('lock-error').textContent = '';
+        pinEntry = '';
+      }, 800);
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('lock-screen').style.display === 'none') return;
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    if (e.key === 'Backspace') pinDel();
+  });
+</script>
 
 <div id="loading">🌿 loading...</div>
 <div id="app" style="display:none">
